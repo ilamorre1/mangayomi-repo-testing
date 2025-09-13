@@ -8,7 +8,7 @@
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=allnovel.org",
     "isNsfw": false,
     "hasCloudflare": false,
-    "sourceCodeUrl": "https://raw.githubusercontent.com/<your-user>/<your-repo>/main/allnovel.js",
+    "sourceCodeUrl": "https://github.com/ilamorre1/mangayomi-repo-testing/blob/main/allnovel.js",
     "apiUrl": "",
     "version": "0.0.1",
     "isManga": false,
@@ -20,3 +20,4 @@
     "notes": ""
   }
 ]
+
