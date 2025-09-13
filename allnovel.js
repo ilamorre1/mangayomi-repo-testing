@@ -1,6 +1,32 @@
 // novel/src/en/allnovel.js
 
-class AllNovel extends MProvider {
+const mangayomiSources = [
+  {
+    "name": "AllNovel",
+    "id": 987654321, // pick a unique random number
+    "baseUrl": "https://allnovel.org",
+    "lang": "en",
+    "typeSource": "single",
+    "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://allnovel.org/",
+    "dateFormat": "",
+    "dateFormatLocale": "",
+    "isNsfw": false,
+    "hasCloudflare": false,
+    "sourceCodeUrl": "",
+    "apiUrl": "",
+    "version": "0.0.1",
+    "isManga": false,
+    "itemType": 2,
+    "isFullData": false,
+    "appMinVerReq": "0.5.0",
+    "additionalParams": "",
+    "sourceCodeLanguage": 1,
+    "notes": "",
+    "pkgPath": "novel/src/en/allnovel.js"
+  },
+];
+
+class AllNovelExtension extends MProvider {
   constructor() {
     super();
     this.client = new Client();
@@ -12,7 +38,7 @@ class AllNovel extends MProvider {
     return new Document(body);
   }
 
-  async search(query, page) {
+  async searchPage({ query = "", page = 1 } = {}) {
     const slug = `/search?keyword=${encodeURIComponent(query)}&page=${page}`;
     const doc = await this.request(slug);
 
@@ -27,6 +53,18 @@ class AllNovel extends MProvider {
     const hasNextPage = doc.selectFirst(".PagedList-skipToNext") !== null;
 
     return { list, hasNextPage };
+  }
+
+  async getPopular(page) {
+    return await this.searchPage({ page });
+  }
+
+  async getLatestUpdates(page) {
+    return await this.searchPage({ page });
+  }
+
+  async search(query, page, filters) {
+    return await this.searchPage({ query, page });
   }
 
   async getDetail(url) {
@@ -49,14 +87,30 @@ class AllNovel extends MProvider {
     doc.select("#chapterlist li a").forEach((a) => {
       const chapLink = a.getHref;
       const chapName = a.text.trim();
-      chapters.push({ name: chapName, url: chapLink });
+      chapters.push({
+        name: chapName,
+        url: chapLink,
+        dateUpload: "", // could parse if dates available
+      });
     });
 
-    return { name, imageUrl, description, link: url, status, genre, chapters };
+    return {
+      name,
+      imageUrl,
+      description,
+      link: url,
+      status,
+      genre,
+      chapters,
+    };
   }
 
   async getHtmlContent(name, url) {
     const doc = await this.request(url.replace(this.source.baseUrl, ""));
+    return this.cleanHtmlContent(doc);
+  }
+
+  async cleanHtmlContent(doc) {
     const contentNodes = doc.select(".text-left p, .chapter-content p");
     let content = "";
     contentNodes.forEach((p) => {
@@ -64,6 +118,14 @@ class AllNovel extends MProvider {
     });
     return content;
   }
+
+  getFilterList() {
+    // Basic filters only, could be expanded if needed
+    return [];
+  }
+
+  getSourcePreferences() {
+    throw new Error("getSourcePreferences not implemented");
+  }
 }
 
-export default AllNovel;
